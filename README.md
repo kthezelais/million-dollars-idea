@@ -1,4 +1,4 @@
-# YOUR PROJECT TITLE
+# Million $ Idea
 #### Video Demo:  https://youtu.be/GFfsWAZUblQ
 
 ## Description:
