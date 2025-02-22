@@ -1,0 +1,171 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Post
+{% endblock %}
+
+{% block main %}
+    <header>
+        <h1 class="header">{% if post %}Edit your idea{% else %}Post an idea{% endif %}</h1>
+    </header>
+
+    <form action="/{% if post %}edit-post{% else %}post{% endif %}" id="auth-form" method="POST">
+        <md-outlined-text-field type="text" name="title" label="Title" autofocus autocomplete="off" {% if post %}value="{{ post['title'] }}"{% endif %}></md-outlined-text-field>
+
+        <div class="searchbar">
+            <md-outlined-text-field type="search" name="tags" label="Search tags" autocomplete="off">
+                <md-icon slot="leading-icon"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg></md-icon>
+            </md-outlined-text-field>
+
+            <ul></ul>
+        </div>
+
+        <md-chip-set>
+            {% if post %}
+                {% for tag in post["tags"] %}
+                    <md-input-chip label="{{ tag[1] }}" value="{{ tag[0] }}"></md-input-chip>
+                {% endfor %}
+            {% endif %}
+        </md-chip-set>
+
+        <md-outlined-text-field type="textarea" style="min-height: 200px; max-height: 350px;" name="description" label="Describe your idea here!" autocomplete="off" {% if post %}value="{{ post['description'] }}"{% endif %}></md-outlined-text-field>
+
+        <div>
+            <md-outlined-button id="{% if post %}cancel-form{% else %}clear-form{% endif %}">Cancel</md-outlined-button>
+            <md-filled-button type="submit">{% if post %}Update{% else %}Publish{% endif %}</md-filled-button>
+        </div>
+    </form>
+
+    <script>
+        let searchBar = document.getElementsByClassName("searchbar")[0].firstElementChild;
+        let searchList = document.getElementsByClassName("searchbar")[0].lastElementChild;
+        let tags = document.getElementsByTagName("md-chip-set")[0];
+        let form = document.querySelector("form[id='auth-form']");
+        let path = window.location.href.split('/')[window.location.href.split('/').length - 1]
+
+        // Hide search list when page load
+        searchList.style.display = "none";
+
+        // Format the search input to be capitalized only
+        async function formatTag(tagName) {
+            const tags = document.getElementsByTagName("md-input-chip");
+
+            // Check is tagName already exist in the list of selected tags
+            for (let i = 0; i < tags.length; i++) {
+                if (tags[i].getAttribute("label").toUpperCase() === tagName.toUpperCase()) {
+                    return null;
+                }
+            }
+
+            const res = await fetch("/tags?search=" + tagName);
+            const data = await res.json();
+
+            // Verify if tag exist in database
+            for (let i = 0; i < data.length; i++) {
+                if (data[i][1].toUpperCase() === tagName.toUpperCase()) {
+                    return { "id": data[i][0], "name": data[i][1] };
+                }
+            }
+
+            // Return id = -1 if tag doesn't exist in database
+            return { "id": -1, "name": tagName[0].toUpperCase() + tagName.slice(1).toLowerCase() };
+        }
+
+        // Inject tag list in formData before submiting
+        form.addEventListener("formdata", function(e) {
+            e.preventDefault();
+
+            let formData = e.formData;
+            let tagsForm = [];
+
+            for (let tag of tags.children) {
+                tagsForm.push({
+                    "id": tag.getAttribute("value"),
+                    "name": tag.getAttribute("label")
+                });
+            }
+
+            if (path.split('?')[0] == 'edit-post') {
+                formData.set("post_id", path.split('=')[1]);
+            }
+            formData.set("tags", JSON.stringify(tagsForm));
+        });
+
+        // Throw and event when a key is pressed inside the tag search bar
+        searchBar.addEventListener("keyup", async function(keyEvent) {
+            const res = await fetch("/tags?search=" + searchBar.value);
+            const data = await res.json();
+
+            // Escape button is pressed
+            if (keyEvent.which == 27) {
+                searchList.style.display = "none";
+            // Enter is pressed and there is at least 2 characters in the search bar
+            } else if (keyEvent.which == 13 && searchBar.value.length > 1) {
+                const tagVal = await formatTag(searchBar.value);
+
+                if (tagVal) {
+                    let tag = document.createElement("md-input-chip");
+                    tag.setAttribute("label", tagVal["name"]);
+                    tag.setAttribute("value", tagVal["id"]);
+                    tags.appendChild(tag);
+                }
+                searchList.style.display = "none";
+                searchBar.value = "";
+            // Else (ex: a tag has been clicked from the list)
+            } else {
+                searchList.innerHTML = "";
+                for (let i = 0; i < data.length; i++) {
+                    let a = document.createElement("a");
+                    a.innerHTML = `<li>` + data[i][1] + `</li>`;
+
+                    a.addEventListener("click", async function(e) {
+                        e.preventDefault();
+                        const tagVal = await formatTag(data[i][1]);
+
+                        if (tagVal) {
+                            let tag = document.createElement("md-input-chip");
+                            tag.setAttribute("label", tagVal["name"]);
+                            tag.setAttribute("value", tagVal["id"]);
+                            tags.appendChild(tag);
+                        }
+                        searchList.style.display = "none";
+                        searchBar.value = "";
+                    });
+                    searchList.appendChild(a);
+                }
+                searchList.style.display = "block";
+            }
+        });
+    </script>
+
+    {% if post %}
+        <script>
+            let cancelFormBtn = document.getElementById("cancel-form");
+
+            // Cancel form button
+            cancelFormBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+                let a = document.createElement("a");
+                a.setAttribute("href", "/view?id=" + path.split('=')[1]);
+                a.click();
+                console.log("/view?id=" + path.split('=')[1]);
+            });
+        </script>
+    {% else %}
+        <script>
+            let clearFormBtn = document.getElementById("clear-form");
+            let titleTxtField = document.querySelector("md-outlined-text-field[name='title']");
+            let descTxtField = document.querySelector("md-outlined-text-field[name='description']")
+
+            // Clear form button
+            clearFormBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+
+                tags.innerHTML = "";
+                searchBar.value = "";
+                titleTxtField.value = "";
+                descTxtField.value = "";
+            });
+        </script>
+    {% endif %}
+{% endblock %}

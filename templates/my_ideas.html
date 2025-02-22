@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    My Ideas
+{% endblock %}
+
+{% block main %}
+    <header>
+        <h1>Hello {{ username }}!</h1>
+
+        <h5><span style="color: rgba(78, 38, 131, 0.5);">Here you can manage your ideas</span></h5>
+    </header>
+
+    {% if posts | length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Tags</th>
+                    <th>Created at</th>
+                    <th>Last update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                    <tr>
+                        <td>
+                            <button class="delete-button" postId="{{ post['id'] }}" postTitle="{{ post['title'] }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                                    <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                                </svg>
+                            </button>
+                        </td>
+                        <td><a href="/view?id={{ post['id'] }}">{{ post["title"] }}</a></td>
+                        <td>{{ post["description"] }}</td>
+                        <td>{{ post["tags"] | join(' - ') }}</td>
+                        <td>{{ post["createdAt"] }}</td>
+                        <td>{{ post["updatedAt"] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <md-dialog id="popup">
+            <div slot="headline">Delete Post</div>
+            <form slot="content" id="form-id" method="dialog">
+                Are you sure you want to proceed and delete your idea XXXXXX?
+            </form>
+            <div slot="actions">
+                <md-text-button form="form-id" value="cancel">Cancel</md-text-button>
+                <md-text-button form="form-id" value="ok">Delete</md-text-button>
+            </div>
+        </md-dialog>
+
+        <script>
+            let deleteBtns = document.getElementsByClassName("delete-button");
+            let popup = document.getElementById("popup");
+
+            for (let i = 0; i < deleteBtns.length; i++) {
+                console.log(deleteBtns[i].getAttribute("postTitle"));
+
+                deleteBtns[i].addEventListener("click", function(e) {
+                    e.preventDefault();
+                    popup.show();
+
+                    let deletePopUpBtn = document.querySelector("md-text-button[value='ok']");
+                    let form = document.querySelector("form[id='form-id']");
+
+                    form.innerHTML = form.innerHTML.replace("XXXXXX", '<span style="font-weight: bold">' + deleteBtns[i].getAttribute("postTitle") + '</span>"');
+
+                    deletePopUpBtn.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        a = document.createElement("a");
+                        a.setAttribute("href", "/delete-post?post_id=" + deleteBtns[i].getAttribute("postId"));
+                        a.click();
+                    });
+                });
+            }
+        </script>
+    {% else %}
+        <p>No amazing ideas to display yet</p>
+    {% endif %}
+{% endblock %}

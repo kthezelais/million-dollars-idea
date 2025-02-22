@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block main %}
+    <header>
+        <h1>Settings</h1>
+
+        <p>Welcome <span style="font-weight: bold;">{{ username }}</span>!</p>
+    </header>
+
+    <div id="settings-body">
+        <div>
+            <button id="reset-password">
+                <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#FFFFFF">
+                    <path d="M80-200v-80h800v80H80Zm46-242-52-30 34-60H40v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Zm320 0-52-30 34-60h-68v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Zm320 0-52-30 34-60h-68v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Z"/>
+                </svg>
+                Reset</br>Password
+            </button>
+            <button id="delete-account">
+                <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#FFFFFF">
+                    <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                </svg>
+                Delete</br>Account
+            </button>
+        </div>
+    </div>
+
+    <md-dialog id="reset-password-popup">
+        <div slot="headline">Reset Password</div>
+        <form slot="content" id="form-id" action="/reset-password" method="POST">
+            <md-outlined-text-field type="password" name="password" label="Password" autofocus autocomplete="off"></md-outlined-text-field>
+            <md-outlined-text-field type="password" name="new-password" label="New Password" autocomplete="off"></md-outlined-text-field>
+            <md-outlined-text-field type="password" name="confirmation" label="Confirm new password" autocomplete="off"></md-outlined-text-field>
+        </form>
+        <div slot="actions">
+            <md-text-button form="form-id" value="cancel">Cancel</md-text-button>
+            <md-text-button form="form-id" value="ok">Reset</md-text-button>
+        </div>
+    </md-dialog>
+
+    <md-dialog id="delete-account-popup">
+        <div slot="headline">Delete Account</div>
+        <form slot="content" id="form-id" method="dialog">
+            Are you sure you want to proceed and delete your account?
+        </form>
+        <div slot="actions">
+            <md-text-button form="form-id" value="cancel">Cancel</md-text-button>
+            <md-text-button form="form-id" value="ok">Delete</md-text-button>
+        </div>
+    </md-dialog>
+
+    <script>
+        let resetPasswordBtn = document.getElementById("reset-password");
+        let deleteAccountBtn = document.getElementById("delete-account");
+        let resetPasswordPopup = document.getElementById("reset-password-popup");
+        let deleteAccountPopup = document.getElementById("delete-account-popup");
+
+        resetPasswordBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            resetPasswordPopup.show();
+
+            resetPasswordPopup.getElementsByTagName("md-text-button")[0].addEventListener("click", function(e) {
+                e.preventDefault();
+                resetPasswordPopup.close();
+            });
+
+            resetPasswordPopup.getElementsByTagName("md-text-button")[1].addEventListener("click", function(e) {
+                e.preventDefault();
+                let form = resetPasswordPopup.getElementsByTagName("form")[0];
+                form.submit();
+            });
+        });
+
+        deleteAccountBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            deleteAccountPopup.show();
+
+            deleteAccountPopup.getElementsByTagName("md-text-button")[0].addEventListener("click", function(e) {
+                e.preventDefault();
+                deleteAccountPopup.close();
+            });
+
+            deleteAccountPopup.getElementsByTagName("md-text-button")[1].addEventListener("click", function(e) {
+                e.preventDefault();
+                let a = document.createElement("a");
+                a.setAttribute("href", "/delete-account");
+                a.click();
+            });
+        });
+    </script>
+{% endblock %}

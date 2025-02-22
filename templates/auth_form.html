@@ -1,0 +1,21 @@
+<script>
+    let form = document.getElementById("auth-form");
+    let clearFormButton = document.getElementById("clear-form");
+    let textFields = form.getElementsByTagName("md-outlined-text-field");
+
+    // Submit form if "Enter" has been pressed on form last text field
+    textFields[textFields.length - 1].addEventListener("keyup", function(e) {
+        if (e.which == 13) {
+            form.submit()
+        }
+    })
+
+    // Clear text fields in form when button is clicked
+    clearFormButton.addEventListener("click", function(e) {
+        e.preventDefault();
+
+        for (let i = 0; i < textFields.length; i++) {
+            textFields[i].value = "";
+        }
+    });
+</script>

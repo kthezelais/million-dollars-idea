@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block main %}
+    <header>
+        <h1 class="header">Login</h1>
+    </header>
+
+    <form id="auth-form" action="/login" method="POST">
+        <md-outlined-text-field type="text" name="username" label="Username" autofocus autocomplete="off"></md-outlined-text-field>
+        <md-outlined-text-field type="password" name="password" label="Password" autocomplete="off"></md-outlined-text-field>
+
+        <p>
+            Or click to <a href="/register" style="color: #;">Register</a>
+        </p>
+
+        <div>
+            <md-outlined-button id="clear-form">Cancel</md-outlined-button>
+            <md-filled-button type="submit">Login</md-filled-button>
+        </div>
+    </form>
+
+    {% include "auth_form.html" %}
+{% endblock %}

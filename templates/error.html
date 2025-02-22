@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Error
+{% endblock %}
+
+{% block main %}
+    <div class="error">
+        <img style="width: 300px; height: 500px;" src="https://cdn.prod.website-files.com/64c73d04a946980a4476537e/64d4520749a58717c1f21a69_Pondering.svg" />
+
+        <div>
+            <h2>Uh-Oh</h2>
+            <h4>{{ code }}</h4>
+            <p>{{ message }}</p>
+        </div>
+    </div>
+{% endblock %}

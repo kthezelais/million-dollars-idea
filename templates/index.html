@@ -1,0 +1,251 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <div id="filters">
+        <div>
+            {% if request.args.get('type') and request.args.get('type') == "most-stared" %}
+                <button id="latest-ones">Latest ones</button>
+                <button id="most-stared" disabled>Most stared</button>
+            {% else %}
+                <button id="latest-ones" disabled>Latest ones</button>
+                <button id="most-stared">Most stared</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="filterTags">
+        <md-outlined-text-field type="search" name="tags" label="Filter by tags" autocomplete="off">
+            <md-icon slot="leading-icon"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg></md-icon>
+        </md-outlined-text-field>
+
+        <button id="button-send-filters">Apply</button>
+
+        <ul></ul>
+    </div>
+
+    <md-chip-set>
+        {% if tags %}
+            {% for tag in tags %}
+                <md-input-chip label="{{ tag[1] }}" value="{{ tag[0] }}"></md-input-chip>
+            {% endfor %}
+        {% endif %}
+    </md-chip-set>
+
+    <md-filled-button id="new-post-button" href="/post">
+        <div>
+            Add
+            <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#FFFFFF">
+                <path d="M480-80q-26.67 0-47.33-12.83Q412-105.67 404-128h-9.33q-27 0-46.84-19.83Q328-167.67 328-194.67v-142.66Q264.33-379 227.17-445 190-511 190-590q0-121 84.5-205.5T480-880q121 0 205.5 84.5T770-590q0 79.67-37.17 145.33Q695.67-379 632-337.33v142.66q0 27-19.83 46.84Q592.33-128 565.33-128H556q-8 22.33-28.67 35.17Q506.67-80 480-80Zm-85.33-114.67h170.66V-236H394.67v41.33Zm0-81.33h170.66v-39.33H394.67V-276ZM386-382h68.67v-127.33L364-600l34.67-34.67L480-553.33l81.33-81.34L596-600l-90.67 90.67V-382H574q58-27.33 93.67-83.5 35.66-56.17 35.66-124.5 0-94-64.66-158.67Q574-813.33 480-813.33q-94 0-158.67 64.66Q256.67-684 256.67-590q0 68.33 35.66 124.5Q328-409.33 386-382Zm94-171.33Zm0-44.67Z"/>
+            </svg>
+            Your own!
+        </div>
+    </md-filled-button>
+
+    <section id="feed">
+
+        {% if posts %}
+            {% include "pagination.html" %}
+
+            {% for post in posts %}
+                <article>
+                    <div class="card">
+                        <div>
+                            <div>
+                                <a href="/view?id={{ post['id'] }}"><h2>{{ post["title"] }}</h2></a>
+                                <div class="star">
+                                    <span class="nb-stars">{{ post["stars"] }}</span>
+
+                                    {% if post["liked"] %}
+                                        <a href="/star?post_id={{ post['id'] }}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#4e2683" class="bi bi-star-fill" viewBox="0 0 16 16"><path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"></path></svg></a>
+                                    {% else %}
+                                        <a href="/star?post_id={{ post['id'] }}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#4e2683" class="bi bi-star" viewBox="0 0 16 16"><path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.56.56 0 0 0-.163-.505L1.71 6.745l4.052-.576a.53.53 0 0 0 .393-.288L8 2.223l1.847 3.658a.53.53 0 0 0 .393.288l4.052.575-2.906 2.77a.56.56 0 0 0-.163.506l.694 3.957-3.686-1.894a.5.5 0 0 0-.461 0z"></path></svg></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <p>
+                                {{ post["description"] }}
+                            </p>
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                    <footer>
+                        <p>{{ post["username"] }}</p>
+                        <p>{{ post["createdAt"] }}</p>
+                    </footer>
+                </article>
+            {% endfor %}
+
+            {% include "pagination.html" %}
+
+            {% include "star_mgmt.html" %}
+        {% else %}
+            <p>No brilliant ideas yet</p>
+        {% endif %}
+    </section>
+
+    <script>
+        let latestOnesBtn = document.getElementById("latest-ones");
+        let mostStaredBtn = document.getElementById("most-stared");
+        let paginations = document.getElementsByClassName("pagination");
+        let path = window.location.href.split('/')[window.location.href.split('/').length - 1];
+        const urlParams = new URLSearchParams(window.location.search);
+
+        latestOnesBtn.addEventListener("click", function() {
+            let a = document.createElement("a");
+            if (path.includes("tag")) {
+                a.setAttribute("href", `/?type=latest-ones&tag=${urlParams.get("tag")}`)
+            } else {
+                a.setAttribute("href", "/?type=latest-ones")
+            }
+            a.click();
+        });
+
+        mostStaredBtn.addEventListener("click", function() {
+            let a = document.createElement("a");
+            if (path.includes("tag")) {
+                a.setAttribute("href", `/?type=most-stared&tag=${urlParams.get("tag")}`);
+            } else {
+                a.setAttribute("href", "/?type=most-stared");
+            }
+            a.click();
+        })
+
+        if (path !== "") {
+            for (let pagination of paginations) {
+                for (let page of pagination.children) {
+                    let pageArgs = page.getAttribute("href");
+
+                    if (path.includes("most-stared")) {
+                        if (path.includes("tag")) {
+                            page.setAttribute("href", pageArgs + "&type=most-stared");
+                        } else {
+                            page.setAttribute("href", pageArgs + "&type=most-stared");
+                        }
+                    } else {
+                        page.setAttribute("href", pageArgs);
+                    }
+
+                    if (path.includes("tag")) {
+                        page.setAttribute("href", page.getAttribute("href") + `&tag=${urlParams.get("tag")}`)
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+        let searchBar = document.getElementsByClassName("filterTags")[0].firstElementChild;
+        let searchList = document.getElementsByClassName("filterTags")[0].lastElementChild;
+        let tags = document.getElementsByTagName("md-chip-set")[0];
+        let sendFiltersBtn = document.getElementById("button-send-filters");
+
+        // Hide search list when page load
+        searchList.style.display = "none";
+
+        // Format the search input to be capitalized only
+        async function formatTag(tagName) {
+            const tags = document.getElementsByTagName("md-input-chip");
+
+            // Check is tagName already exist in the list of selected tags
+            for (let i = 0; i < tags.length; i++) {
+                if (tags[i].getAttribute("label").toUpperCase() === tagName.toUpperCase()) {
+                    return null;
+                }
+            }
+
+            const res = await fetch("/tags?search=" + tagName);
+            const data = await res.json();
+
+            // Verify if tag exist in database
+            for (let i = 0; i < data.length; i++) {
+                if (data[i][1].toUpperCase() === tagName.toUpperCase()) {
+                    return { "id": data[i][0], "name": data[i][1] };
+                }
+            }
+
+            // Return id = -1 if tag doesn't exist in database
+            return { "id": -1, "name": tagName[0].toUpperCase() + tagName.slice(1).toLowerCase() };
+        }
+
+        // Throw and event when a key is pressed inside the tag search bar
+        searchBar.addEventListener("keyup", async function(keyEvent) {
+            const res = await fetch("/tags?search=" + searchBar.value);
+            const data = await res.json();
+
+            // Escape button is pressed
+            if (keyEvent.which == 27) {
+                searchList.style.display = "none";
+            // Enter is pressed and there is at least 2 characters in the search bar
+            } else if (keyEvent.which == 13 && searchBar.value.length > 1) {
+                const tagVal = await formatTag(searchBar.value);
+
+                if (tagVal["id"] != -1) {
+                    let tag = document.createElement("md-input-chip");
+                    tag.setAttribute("label", tagVal["name"]);
+                    tag.setAttribute("value", tagVal["id"]);
+                    tags.appendChild(tag);
+                    searchList.style.display = "none";
+                    searchBar.value = "";
+                }
+            // Else (ex: a tag has been clicked from the list)
+            } else {
+                searchList.innerHTML = "";
+                for (let i = 0; i < data.length; i++) {
+                    let a = document.createElement("a");
+                    a.innerHTML = `<li>` + data[i][1] + `</li>`;
+
+                    a.addEventListener("click", async function(e) {
+                        e.preventDefault();
+                        const tagVal = await formatTag(data[i][1]);
+
+                        if (tagVal["id"] != -1) {
+                            let tag = document.createElement("md-input-chip");
+                            tag.setAttribute("label", tagVal["name"]);
+                            tag.setAttribute("value", tagVal["id"]);
+                            tags.appendChild(tag);
+                            searchList.style.display = "none";
+                            searchBar.value = "";
+                        }
+                    });
+                    searchList.appendChild(a);
+                }
+                searchList.style.display = "block";
+            }
+        });
+
+
+        // Handle tags filter searchbar
+        sendFiltersBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            const tags = document.getElementsByTagName("md-input-chip");
+            const urlParams = new URLSearchParams(path);
+            let targetURL = "";
+            let a = document.createElement("a");
+
+            if (urlParams.get("type")) {
+                targetURL = `/?type=${urlParams.get("type")}`;
+            }
+
+            for (let i = 0; i < tags.length; i++) {
+                if (targetURL == "") {
+                    targetURL = `/?tag=${tags[i].getAttribute("value")}`;
+                } else if (!targetURL.includes("tag")) {
+                    targetURL = `${targetURL}&tag=${tags[i].getAttribute("value")}`;
+                } else {
+                    targetURL = `${targetURL}-${tags[i].getAttribute("value")}`;
+                }
+            }
+
+            if (targetURL != "") {
+                a.setAttribute("href", targetURL);
+                a.click();
+            }
+        });
+    </script>
+{% endblock %}

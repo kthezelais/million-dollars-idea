@@ -1,0 +1,51 @@
+<div class="pagination">
+    {% if page != 1 %}
+        <a href="/?page={{ page - 1 }}">&laquo;</a>
+    {% endif %}
+
+    {% if nb_pages > 0 and page - 2 >= 1 %}
+        {% if page == 1 %}
+            <a class="active" href="/?page=1">1</a>
+        {% else %}
+            <a href="/?page=1">1</a>
+        {% endif %}
+    {% endif %}
+
+    {% if nb_pages > 1 and page - 2 >= 2 %}
+        {% if page == 2 %}
+            <a class="active" href="/?page=1">2</a>
+        {% else %}
+            <a href="/?page=2">2</a>
+        {% endif %}
+    {% endif %}
+
+    {% if page - 2 > 2 %}
+        <a href="/?page={{ ((2 + page) / 2) | int }}">...</a>
+    {% endif %}
+
+    {% for n in range(page - 1, page + 2) %}
+        {% if n > 0 and n <= nb_pages %}
+            {% if n == page %}
+                <a class="active" href="/?page={{ n }}">{{ n }}</a>
+            {% else %}
+                <a href="/?page={{ n }}">{{ n }}</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% if page + 2 < nb_pages - 1 %}
+        <a href="/?page={{ ((page + 2 + nb_pages - 1) / 2) | int }}">...</a>
+    {% endif %}
+
+    {% if page + 1 < nb_pages - 1 %}
+        <a href="/?page={{ nb_pages - 1 }}">{{ nb_pages - 1 }}</a>
+    {% endif %}
+
+    {% if page + 1 < nb_pages %}
+        <a href="/?page={{ nb_pages }}">{{ nb_pages }}</a>
+    {% endif %}
+
+    {% if page != nb_pages %}
+        <a href="/?page={{ page + 1}}">&raquo;</a>
+    {% endif %}
+</div>

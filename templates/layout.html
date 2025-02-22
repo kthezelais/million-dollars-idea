@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Million Dollar Ideas - {% block title %}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link href="/static/style.css" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "@material/web/": "https://esm.run/@material/web/"
+            }
+        }
+    </script>
+    <script type="module">
+        import '@material/web/all.js';
+        import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+
+        document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+    </script>
+</head>
+
+<body>
+
+    <nav>
+        <h1>
+            <a href="/">Million $ Ideas</a>
+        </h1>
+
+        {% if session["user_id"] %}
+            <!-- Note the lack of position: relative parent. -->
+            <div>
+                <button class="user-setting-button" id="usage-fixed-anchor">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 -960 960 960" width="36px" fill="#4e2683">
+                        <path d="M360-390q-21 0-35.5-14.5T310-440q0-21 14.5-35.5T360-490q21 0 35.5 14.5T410-440q0 21-14.5 35.5T360-390Zm240 0q-21 0-35.5-14.5T550-440q0-21 14.5-35.5T600-490q21 0 35.5 14.5T650-440q0 21-14.5 35.5T600-390ZM480-160q134 0 227-93t93-227q0-24-3-46.5T786-570q-21 5-42 7.5t-44 2.5q-91 0-172-39T390-708q-32 78-91.5 135.5T160-486v6q0 134 93 227t227 93Zm0 80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm-54-715q42 70 114 112.5T700-640q14 0 27-1.5t27-3.5q-42-70-114-112.5T480-800q-14 0-27 1.5t-27 3.5ZM177-581q51-29 89-75t57-103q-51 29-89 75t-57 103Zm249-214Zm-103 36Z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Fixed menus do not require a common ancestor with the anchor. -->
+            <md-menu positioning="fixed" id="usage-fixed" anchor="usage-fixed-anchor">
+                <md-menu-item>
+                    <div slot="headline">Settings</div>
+                </md-menu-item>
+                <md-menu-item>
+                    <div slot="headline">My Ideas</div>
+                </md-menu-item>
+                <md-menu-item>
+                    <div slot="headline">Logout</div>
+                </md-menu-item>
+            </md-menu>
+
+            <script type="module">
+                const anchorEl = document.body.querySelector('#usage-fixed-anchor');
+                const menuEl = document.body.querySelector('#usage-fixed');
+                const menu = document.getElementsByTagName("md-menu")[0]
+
+                menu.firstElementChild.addEventListener("click", function (){
+                    window.location.href = "/settings";
+                });
+
+                menu.children[1].addEventListener("click", function (){
+                    window.location.href = "/my-ideas";
+                });
+
+                menu.lastElementChild.addEventListener("click", function (){
+                    window.location.href = "/logout";
+                });
+
+                anchorEl.addEventListener('click', () => { menuEl.open = !menuEl.open; });
+            </script>
+        {% else %}
+            <div>
+                <a href="/login">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 -960 960 960" width="36px" fill="#4e2683">
+                        <path d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q53 0 100-15.5t86-44.5q-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160Zm0-360q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm0-60Zm0 360Z"/>
+                    </svg>
+                </a>
+            </div>
+        {% endif %}
+    </nav>
+
+    {% if get_flashed_messages() %}
+        <div id="notification">
+            <div>
+                <p>
+                    {{ get_flashed_messages() | join(" ") }}
+                </p>
+                <a href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#ecd24e">
+                        <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <script>
+            let notification = document.getElementById("notification");
+            let cross = notification.getElementsByTagName("a")[0];
+
+            cross.addEventListener("click", function (){
+                notification.remove();
+            });
+        </script>
+    {% endif %}
+
+    <div id="main">
+        {% block main %}{% endblock %}
+    </div>
+
+</body>
+
+</html>
